@@ -15,16 +15,16 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StatDtoIn {
-    @NotNull(groups = StatValidate.onCreate.class)
-    @NotBlank(message = "Пустое поле 'app'", groups = StatValidate.onCreate.class)
+    @NotNull(groups = StatValidate.OnCreate.class)
+    @NotBlank(message = "Пустое поле 'app'", groups = StatValidate.OnCreate.class)
     private String app;
-    @NotNull(groups = StatValidate.onCreate.class)
-    @NotBlank(message = "Пустое поле 'uri'", groups = StatValidate.onCreate.class)
+    @NotNull(groups = StatValidate.OnCreate.class)
+    @NotBlank(message = "Пустое поле 'uri'", groups = StatValidate.OnCreate.class)
     private String uri;
-    @NotNull(groups = StatValidate.onCreate.class)
-    @NotBlank(message = "Пустое поле 'ip'", groups = StatValidate.onCreate.class)
+    @NotNull(groups = StatValidate.OnCreate.class)
+    @NotBlank(message = "Пустое поле 'ip'", groups = StatValidate.OnCreate.class)
     private String ip;
-    @NotNull(message = "Пустое поле 'timestamp'", groups = StatValidate.onCreate.class)
+    @NotNull(message = "Пустое поле 'timestamp'", groups = StatValidate.OnCreate.class)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime timestamp;
 }

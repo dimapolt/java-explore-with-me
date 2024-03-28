@@ -22,7 +22,7 @@ public class StatController {
     private final StatClient statClient;
 
     @PostMapping("/hit")
-    @Validated({StatValidate.onCreate.class})
+    @Validated({StatValidate.OnCreate.class})
     public ResponseEntity<Object> addStat(@RequestBody @Valid StatDtoIn statDto) {
         log.info("Запрос на добавление статистики");
         return statClient.addStat(statDto);
