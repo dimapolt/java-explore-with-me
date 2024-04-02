@@ -25,6 +25,6 @@ public class StatDtoIn {
     @NotBlank(message = "Пустое поле 'ip'", groups = StatValidate.OnCreate.class)
     private String ip;
     @NotNull(message = "Пустое поле 'timestamp'", groups = StatValidate.OnCreate.class)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime timestamp;
 }
