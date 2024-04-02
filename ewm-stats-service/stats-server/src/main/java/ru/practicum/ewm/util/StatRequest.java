@@ -1,4 +1,4 @@
-package ru.practicum.ewm.model;
+package ru.practicum.ewm.util;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
