@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.user.dto.UserDto;
-import ru.practicum.ewm.user.dto.UserDtoCreate;
+import ru.practicum.ewm.user.dto.NewUserRequest;
 import ru.practicum.ewm.user.service.UserService;
 import ru.practicum.ewm.util.EwmRequest;
 import ru.practicum.ewm.util.EwmValidate;
@@ -27,7 +27,7 @@ public class UserControllerAdminApi {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Validated({EwmValidate.OnCreate.class})
-    public UserDto createUser(@RequestBody @Valid UserDtoCreate user) {
+    public UserDto createUser(@RequestBody @Valid NewUserRequest user) {
         log.info("Запрос на создание пользователя");
         return service.createUser(user);
     }
@@ -37,7 +37,8 @@ public class UserControllerAdminApi {
                                   @RequestParam(defaultValue = "0")
                                       @PositiveOrZero(message = "Отрицательное значение параметра 'from'") int from,
                                   @RequestParam(defaultValue = "10")
-                                      @Positive(message = "Значение параметра 'size' 0 или отрицательное") int size) {
+                                      @Positive(message = "Значение параметра 'size' - " +
+                                                          "0 или отрицательное") int size) {
         log.info("Запрос на получение пользователей по списку id, с {} по {} элементов", from, size);
         return service.getUsers(ids, new EwmRequest(from, size));
     }
