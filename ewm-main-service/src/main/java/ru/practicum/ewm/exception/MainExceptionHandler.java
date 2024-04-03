@@ -8,13 +8,13 @@ import org.springframework.lang.NonNull;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
+import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -67,5 +67,15 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
     public ResponseEntity<String> catchAlreadyExistException(AlreadyExistException exception) {
         log.warn(exception.getMessage());
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorDescription> catchPSQLException(SQLException exception) {
+        ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT,
+                                                            "",
+                                                            exception.getMessage(),
+                                                            LocalDateTime.now());
+
+        return new ResponseEntity<>(description, description.getStatus());
     }
 }

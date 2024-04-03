@@ -1,14 +1,14 @@
 package ru.practicum.ewm.user.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.exception.AlreadyExistException;
 import ru.practicum.ewm.exception.NoDataFoundException;
 import ru.practicum.ewm.user.dto.UserDto;
-import ru.practicum.ewm.user.dto.UserDtoCreate;
-import ru.practicum.ewm.user.dto.UserMapper;
+import ru.practicum.ewm.user.dto.NewUserRequest;
+import ru.practicum.ewm.user.dto.mapper.UserMapper;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.user.storage.UserStorage;
 import ru.practicum.ewm.util.EwmRequest;
@@ -16,8 +16,8 @@ import ru.practicum.ewm.util.EwmRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.ewm.user.dto.UserMapper.toDto;
-import static ru.practicum.ewm.user.dto.UserMapper.toEntity;
+import static ru.practicum.ewm.user.dto.mapper.UserMapper.toDto;
+import static ru.practicum.ewm.user.dto.mapper.UserMapper.toEntity;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +25,8 @@ public class UserServiceImpl implements UserService {
     private final UserStorage storage;
 
     @Override
-    public UserDto createUser(UserDtoCreate userDto) {
+    @Transactional
+    public UserDto createUser(NewUserRequest userDto) {
         User user = toEntity(userDto);
         try {
             return toDto(storage.save(user));
@@ -35,8 +36,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public List<UserDto> getUsers(List<Long> ids, EwmRequest params) {
-        Pageable pageable = PageRequest.of(params.getPage(), params.getSize());
+        Pageable pageable = params.getPageable();
         List<User> users;
 
         if (ids.isEmpty()) {
@@ -51,6 +53,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String deleteUser(long id) {
         User user = storage.findById(id).orElseThrow(() -> new NoDataFoundException("User not found"));
         storage.delete(user);

@@ -14,7 +14,7 @@ import javax.validation.constraints.Size;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDtoCreate {
+public class NewUserRequest {
     @NotBlank(message = "Имя не может быть пустым!", groups = {EwmValidate.OnCreate.class})
     @Size(min = 2, max = 250, message = "Неверная длина имени!")
     private String name;

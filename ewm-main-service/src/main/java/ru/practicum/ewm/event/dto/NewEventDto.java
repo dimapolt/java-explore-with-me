@@ -27,7 +27,7 @@ public class NewEventDto {
     @Future(message = "Неверная дата в поле 'eventDate'!")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime eventDate;
-    @NotNull(message = "Пустое поле 'location'")
+    @NotNull(message = "Пустое поле 'location'", groups = {EwmValidate.OnCreate.class})
     private LocationDto location;
     private boolean paid = true;
     @PositiveOrZero(message = "Поле 'participantLimit' меньше нуля!")
