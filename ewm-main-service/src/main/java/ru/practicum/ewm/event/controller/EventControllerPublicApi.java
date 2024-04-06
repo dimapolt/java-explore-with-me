@@ -46,7 +46,6 @@ public class EventControllerPublicApi {
     @GetMapping("/{id}")
     public EventFullDto getEvent(@PathVariable Long id, HttpServletRequest request) {
         log.info("Публичный запрос на получение события по id = " + id);
-
         return null;
     }
 }

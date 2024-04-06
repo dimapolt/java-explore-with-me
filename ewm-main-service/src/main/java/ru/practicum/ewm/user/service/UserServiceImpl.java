@@ -11,7 +11,7 @@ import ru.practicum.ewm.user.dto.NewUserRequest;
 import ru.practicum.ewm.user.dto.mapper.UserMapper;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.user.storage.UserStorage;
-import ru.practicum.ewm.util.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;

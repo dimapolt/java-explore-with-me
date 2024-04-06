@@ -8,7 +8,7 @@ import ru.practicum.ewm.category.dto.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.storage.CategoryStorage;
 import ru.practicum.ewm.exception.NoDataFoundException;
-import ru.practicum.ewm.util.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequest;
 
 import java.util.List;
 import java.util.stream.Collectors;

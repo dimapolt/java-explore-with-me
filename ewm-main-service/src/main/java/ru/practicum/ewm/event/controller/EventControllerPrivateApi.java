@@ -9,7 +9,7 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.service.ServiceEvent;
-import ru.practicum.ewm.util.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequest;
 import ru.practicum.ewm.util.EwmValidate;
 
 import javax.validation.Valid;
@@ -31,7 +31,7 @@ public class EventControllerPrivateApi {
     public EventFullDto createEvent(@RequestBody @Valid NewEventDto eventDto,
                                     @PathVariable Long userId) {
         log.info("Запрос на создание события");
-        return service.createEvent(eventDto, userId);
+        return service.createEventPrivate(eventDto, userId);
     }
 
     @GetMapping
@@ -43,14 +43,14 @@ public class EventControllerPrivateApi {
                                             @Positive(message = "Значение параметра 'size' - " +
                                                                 "0 или отрицательное") int size) {
         log.info("Запрос на получение списка событий");
-        return service.getEvents(userId, new EwmRequest(from, size));
+        return service.getEventsPrivate(userId, new EwmRequest(from, size));
     }
 
     @GetMapping("/{eventId}")
     public EventFullDto getEvent(@PathVariable Long userId,
                                  @PathVariable Long eventId) {
         log.info("Запрос на получение события с id = " + eventId);
-        return service.getEvent(userId, eventId);
+        return service.getEventPrivate(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")
@@ -58,6 +58,6 @@ public class EventControllerPrivateApi {
                                     @PathVariable Long userId,
                                     @PathVariable Long eventId) {
         log.info("Запрос на обновление события");
-        return service.updateEvent(eventDto, userId, eventId);
+        return service.updateEventPrivate(eventDto, userId, eventId);
     }
 }

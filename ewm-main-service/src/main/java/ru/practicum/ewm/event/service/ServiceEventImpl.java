@@ -4,16 +4,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.model.Category;
-import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
+import ru.practicum.ewm.event.dto.*;
 import ru.practicum.ewm.event.dto.mapper.EventMapper;
 import ru.practicum.ewm.event.model.Event;
+import ru.practicum.ewm.event.model.status.EvenStateAdmin;
 import ru.practicum.ewm.event.model.status.EventState;
 import ru.practicum.ewm.event.storage.EventStorage;
 import ru.practicum.ewm.exception.NoDataFoundException;
 import ru.practicum.ewm.exception.WrongDataException;
-import ru.practicum.ewm.util.EwmRequest;
+import ru.practicum.ewm.util.requests.EventsAdminRequest;
+import ru.practicum.ewm.util.requests.EwmRequest;
 import ru.practicum.ewm.util.EwmValidationService;
 
 import java.time.LocalDateTime;
@@ -32,7 +32,7 @@ public class ServiceEventImpl implements ServiceEvent {
 
     @Override
     @Transactional
-    public EventFullDto createEvent(NewEventDto eventDto, Long userId) {
+    public EventFullDto createEventPrivate(NewEventDto eventDto, Long userId) {
         Event event = toEntity(eventDto, userId);
         validation.formEvent(event);
 
@@ -41,7 +41,7 @@ public class ServiceEventImpl implements ServiceEvent {
 
     @Override
     @Transactional
-    public List<EventFullDto> getEvents(Long userId, EwmRequest request) {
+    public List<EventFullDto> getEventsPrivate(Long userId, EwmRequest request) {
         validation.checkUserExists(userId);
         List<Event> events = storage.findAllByInitiatorId(userId, request.getPageable());
 
@@ -52,7 +52,7 @@ public class ServiceEventImpl implements ServiceEvent {
 
     @Override
     @Transactional
-    public EventFullDto getEvent(Long userId, Long eventId) {
+    public EventFullDto getEventPrivate(Long userId, Long eventId) {
         validation.checkUserExists(userId);
         Event event = searchEvent(eventId, userId);
 
@@ -61,13 +61,79 @@ public class ServiceEventImpl implements ServiceEvent {
 
     @Override
     @Transactional
-    public EventFullDto updateEvent(UpdateEventUserRequest eventDto, Long userId, Long eventId) {
+    public EventFullDto updateEventPrivate(UpdateEventUserRequest eventDto, Long userId, Long eventId) {
         Event event = searchEvent(userId, eventId);
 
         if (event.getState().equals(EventState.PUBLISHED)) {
             throw new WrongDataException("Изменить можно только отмененные события или события в состоянии ожидания");
         }
 
+        if (eventDto.getEventDate() != null) {
+            LocalDateTime evenDate = eventDto.getEventDate();
+            validation.checkDate(evenDate, 2);
+            event.setEventDate(evenDate);
+        }
+
+        if (eventDto.getStateAction().equals(CANCEL_REVIEW)) {
+            event.setState(EventState.CANCELED);
+        } else {
+            event.setState(EventState.PENDING);
+        }
+
+        updateEventFields(eventDto, event);
+        return toFullDto(event);
+    }
+
+    @Override
+    public List<EventFullDto> getEventsAdmin(EventsAdminRequest params) {
+        return null;
+    }
+
+    @Override
+    public EventFullDto updateEventAdmin(Long eventId, UpdateEventAdminRequest eventDto) {
+        Event event = validation.checkEventExists(eventId);
+        validation.checkDate(event.getEventDate(), 1);
+
+        if (eventDto.getEventDate() != null) {
+            LocalDateTime evenDate = eventDto.getEventDate();
+            validation.checkDate(evenDate, 1);
+            event.setEventDate(evenDate);
+        }
+
+        if (eventDto.getStateAction() != null) {
+            if (eventDto.getStateAction().equals(EvenStateAdmin.PUBLISH_EVENT)) {
+                if (event.getState().equals(EventState.PENDING)) {
+                    event.setState(EventState.PUBLISHED);
+                    event.setPublishedOn(LocalDateTime.now());
+                } else {
+                    throw new WrongDataException("Событие можно публиковать, только " +
+                            "если оно в состоянии ожидания публикации");
+                }
+            } else if (eventDto.getStateAction().equals(EvenStateAdmin.REJECT_EVENT)) {
+                if (!event.getState().equals(EventState.PUBLISHED)) {
+                    event.setState(EventState.CANCELED);
+                } else {
+                    throw new WrongDataException("Событие можно отклонить, только если оно еще не опубликовано");
+                }
+            }
+        }
+
+        updateEventFields(eventDto, event);
+        return toFullDto(storage.save(event));
+}
+
+    private Event searchEvent(Long id, Long userId) {
+        Event event = storage.findById(id).orElseThrow(() -> new NoDataFoundException("Событие не найдено"));
+
+        if (!event.getInitiator().getId().equals(userId)) {
+            throw new IllegalArgumentException("Пользователь с id = " + userId +
+                    " не добавлял событие с id = " + id);
+        }
+
+        return event;
+    }
+
+    private void updateEventFields(UpdateEventDto eventDto, Event event) {
         if (eventDto.getAnnotation() != null) {
             event.setAnnotation(eventDto.getAnnotation());
         }
@@ -79,12 +145,6 @@ public class ServiceEventImpl implements ServiceEvent {
 
         if (eventDto.getDescription() != null) {
             event.setDescription(eventDto.getDescription());
-        }
-
-        if (eventDto.getEventDate() != null) {
-            LocalDateTime evenDate = eventDto.getEventDate();
-            validation.checkDate(evenDate);
-            event.setEventDate(evenDate);
         }
 
         if (eventDto.getLocation() != null) {
@@ -103,38 +163,9 @@ public class ServiceEventImpl implements ServiceEvent {
             event.setRequestModeration(eventDto.getRequestModeration());
         }
 
-        if (eventDto.getStateAction().equals(CANCEL_REVIEW)) {
-            event.setState(EventState.CANCELED);
-        } else {
-            event.setState(EventState.PENDING);
-        }
-
         if (eventDto.getTitle() != null) {
             event.setTitle(eventDto.getTitle());
         }
-
-        return toFullDto(event);
-    }
-
-    @Override
-    public EventFullDto getEvent(Long eventId) {
-        Event event = storage.findById(eventId).orElseThrow(()-> new NoDataFoundException("Событие не найдено"));
-
-        if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new NoDataFoundException("Событие не опубликовано");
-        }
-        return toFullDto(event);
-    }
-
-    private Event searchEvent(Long id, Long userId) {
-        Event event = storage.findById(id).orElseThrow(()-> new NoDataFoundException("Событие не найдено"));
-
-        if (!event.getInitiator().getId().equals(userId)) {
-            throw new IllegalArgumentException("Пользователь с id = " + userId +
-                    " не добавлял событие с id = " + id);
-        }
-
-        return event;
     }
 
 }
