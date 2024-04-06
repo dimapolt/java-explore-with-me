@@ -70,7 +70,19 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorDescription> catchPSQLException(SQLException exception) {
+    public ResponseEntity<String> catchWrongDataException(WrongDataException exception) {
+        log.warn(exception.getMessage());
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> catchIllegalArgumentException(IllegalArgumentException exception) {
+        log.warn(exception.getMessage());
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorDescription> catchSQLException(SQLException exception) {
         ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT,
                                                             "",
                                                             exception.getMessage(),

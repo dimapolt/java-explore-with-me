@@ -5,7 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.ewm.category.model.Category;
-import ru.practicum.ewm.event.model.state.EventState;
+import ru.practicum.ewm.event.model.status.EventState;
 import ru.practicum.ewm.user.model.User;
 
 import javax.persistence.*;
@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
     private String annotation;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category")
