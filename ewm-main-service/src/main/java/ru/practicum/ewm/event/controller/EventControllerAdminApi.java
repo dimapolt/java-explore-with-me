@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
-import ru.practicum.ewm.event.model.state.EventState;
+import ru.practicum.ewm.event.model.status.EventState;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;

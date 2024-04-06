@@ -6,7 +6,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
+import ru.practicum.ewm.event.service.ServiceEvent;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -19,6 +21,7 @@ import java.util.List;
 @RequestMapping(path = "/events")
 @Validated
 public class EventControllerPublicApi {
+    private final ServiceEvent service;
 
     @GetMapping
     public List<EventFullDto> getEvents(@RequestParam String text,
@@ -41,8 +44,9 @@ public class EventControllerPublicApi {
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEvent(@PathVariable Long id) {
+    public EventFullDto getEvent(@PathVariable Long id, HttpServletRequest request) {
         log.info("Публичный запрос на получение события по id = " + id);
+
         return null;
     }
 }

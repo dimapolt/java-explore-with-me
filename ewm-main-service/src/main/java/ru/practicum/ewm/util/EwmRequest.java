@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 
 @Getter
 public class EwmRequest {
-    private Pageable pageable;
+    private final Pageable pageable;
 
     public EwmRequest(int from, int size) {
         this.pageable = PageRequest.of(from / size, size);
