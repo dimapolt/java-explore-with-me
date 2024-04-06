@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.dto.NewUserRequest;
 import ru.practicum.ewm.user.service.UserService;
-import ru.practicum.ewm.util.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequest;
 import ru.practicum.ewm.util.EwmValidate;
 
 import javax.validation.Valid;

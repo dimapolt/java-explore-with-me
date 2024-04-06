@@ -38,7 +38,7 @@ public class EwmValidationService {
         Location location = event.getLocation();
         LocalDateTime eventDate = event.getEventDate();
 
-        checkDate(eventDate);
+        checkDate(eventDate, 2);
 
         User user = checkUserExists(userId);
         event.setInitiator(user);
@@ -80,11 +80,10 @@ public class EwmValidationService {
         }
     }
 
-    public void checkDate(LocalDateTime date) {
+    public void checkDate(LocalDateTime date, int hours) {
         // Дата и время на которые намечено событие не может быть раньше, чем через два часа от текущего момента
-        if (date.minusHours(2).isBefore(LocalDateTime.now())) {
-            throw new WrongDataException("Field: eventDate. Error: должно содержать дату, " +
-                    "которая еще не наступила. Value: " + date);
+        if (date.minusHours(hours).isBefore(LocalDateTime.now())) {
+            throw new WrongDataException("До события осталось меньше " + hours + " часов, " + date);
         }
     }
 }

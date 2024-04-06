@@ -4,12 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import ru.practicum.ewm.event.model.status.EvenStateUser;
+import ru.practicum.ewm.event.model.status.EvenStateAdmin;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateEventUserRequest extends UpdateEventDto {
-    private EvenStateUser stateAction;
+public class UpdateEventAdminRequest extends UpdateEventDto{
+    private EvenStateAdmin stateAction;
 }

@@ -6,9 +6,13 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.dto.NewEventDto;
+import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
 import ru.practicum.ewm.event.model.status.EventState;
+import ru.practicum.ewm.event.service.ServiceEvent;
+import ru.practicum.ewm.util.requests.EventsAdminRequest;
+import ru.practicum.ewm.util.requests.EwmRequest;
 
+import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
@@ -20,7 +24,7 @@ import java.util.List;
 @RequestMapping(path = "/admin/events")
 @Validated
 public class EventControllerAdminApi {
-
+    private final ServiceEvent service;
     @GetMapping
     public List<EventFullDto> getEvents(@RequestParam(required = false) List<Long> users,
                                         @RequestParam(required = false) List<EventState> states,
@@ -36,12 +40,16 @@ public class EventControllerAdminApi {
                                         @Positive(message = "Значение параметра 'size' - " +
                                                 "0 или отрицательное") int size) {
         log.info("Запрос на получение списка событий администратором");
-        return null;
+        EwmRequest ewmRequest = new EwmRequest(from, size);
+        EventsAdminRequest eventsAdminRequest = new EventsAdminRequest(users, states, categories,
+                                                                       rangeStart, rangeEnd, ewmRequest);
+        return service.getEventsAdmin(eventsAdminRequest);
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto updateEvent(@PathVariable Long eventId, @RequestBody NewEventDto eventDto) {
+    public EventFullDto updateEvent(@PathVariable Long eventId,
+                                    @RequestBody @Valid UpdateEventAdminRequest eventAdminDto) {
         log.info("Запрос на обновление события администратором");
-        return null;
+        return service.updateEventAdmin(eventId, eventAdminDto);
     }
 }
