@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.dto.StatDtoIn;
 import ru.practicum.ewm.dto.StatDtoOut;
 import ru.practicum.ewm.dto.StatValidate;
-import ru.practicum.ewm.util.StatRequest;
 import ru.practicum.ewm.service.StatService;
+import ru.practicum.ewm.util.StatRequest;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;

@@ -46,7 +46,7 @@ public class EwmValidationService {
         Category category = checkCategoryExists(categoryId);
         event.setCategory(category);
 
-       searchOrCreate(location);
+        searchOrCreate(location);
     }
 
     public User checkUserExists(Long id) {

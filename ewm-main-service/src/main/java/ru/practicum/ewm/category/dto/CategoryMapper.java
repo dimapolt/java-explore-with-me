@@ -8,12 +8,12 @@ public class CategoryMapper {
 
     public static Category toEntity(CategoryDto categoryDto) {
         return new Category(categoryDto.getId(),
-                            categoryDto.getName());
+                categoryDto.getName());
     }
 
     public static CategoryDto toDto(Category category) {
         return new CategoryDto(category.getId(),
-                               category.getName());
+                category.getName());
     }
 
 }

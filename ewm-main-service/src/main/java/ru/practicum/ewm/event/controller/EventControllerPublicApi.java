@@ -30,17 +30,17 @@ public class EventControllerPublicApi {
                                               @RequestParam(required = false) Boolean paid,
                                               @RequestParam(required = false)
                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-                                                  @RequestParam(required = false)
+                                              @RequestParam(required = false)
                                               @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
-                                                  @RequestParam(defaultValue = "false") boolean onlyAvailable,
+                                              @RequestParam(defaultValue = "false") boolean onlyAvailable,
                                               @RequestParam(defaultValue = "EVENT_DATE") String sort,
                                               @RequestParam(defaultValue = "0")
-                                                 @PositiveOrZero(message = "Отрицательное значение " +
-                                                                            "параметра 'from'") int from,
-                                             @RequestParam(defaultValue = "10")
-                                                 @Positive(message = "Значение параметра 'size' - " +
-                                                                      "0 или отрицательное") int size,
-                                            HttpServletRequest httpServletRequest) {
+                                              @PositiveOrZero(message = "Отрицательное значение " +
+                                                      "параметра 'from'") int from,
+                                              @RequestParam(defaultValue = "10")
+                                              @Positive(message = "Значение параметра 'size' - " +
+                                                      "0 или отрицательное") int size,
+                                              HttpServletRequest httpServletRequest) {
         log.info("Публичный запрос на поиск событий по параметрам");
         if (!(sort.equals("EVENT_DATE") || sort.equals("VIEWS"))) {
             throw new IllegalArgumentException("Неверный параметр сортировки! Правильные варианты: EVENT_DATE, VIEWS");
@@ -48,7 +48,7 @@ public class EventControllerPublicApi {
 
         EwmRequestParams page = new EwmRequestParams(from, size, sort);
         EventsPublicRequest eventsPublicRequest = new EventsPublicRequest(text, categories, paid, rangeStart, rangeEnd,
-                                                                          onlyAvailable, page);
+                onlyAvailable, page);
 
         return service.getEventsPublic(eventsPublicRequest, httpServletRequest);
     }

@@ -22,11 +22,11 @@ public class CategoryControllerPublicApi {
 
     @GetMapping
     public List<CategoryDto> getCategories(@RequestParam(defaultValue = "0")
-                                               @PositiveOrZero(message = "Отрицательное значение" +
-                                                                         " параметра 'from'") int from,
+                                           @PositiveOrZero(message = "Отрицательное значение" +
+                                                   " параметра 'from'") int from,
                                            @RequestParam(defaultValue = "10")
-                                               @Positive(message = "Значение параметра 'size' " +
-                                                                   "0 или отрицательное") int size) {
+                                           @Positive(message = "Значение параметра 'size' " +
+                                                   "0 или отрицательное") int size) {
         log.info("Запрос на получение категорий с {} по {} элементов", from, size);
         return service.getCategories(new EwmRequestParams(from, size));
     }

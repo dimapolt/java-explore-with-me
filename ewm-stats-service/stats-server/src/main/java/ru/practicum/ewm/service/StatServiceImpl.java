@@ -7,8 +7,8 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.dto.StatDtoIn;
 import ru.practicum.ewm.dto.StatDtoOut;
 import ru.practicum.ewm.model.Stat;
-import ru.practicum.ewm.util.StatRequest;
 import ru.practicum.ewm.storage.StatStorage;
+import ru.practicum.ewm.util.StatRequest;
 
 import java.util.List;
 
