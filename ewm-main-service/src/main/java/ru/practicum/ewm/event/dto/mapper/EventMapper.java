@@ -38,7 +38,7 @@ public class EventMapper {
                          newEventDto.isRequestModeration(),
                         EventState.PENDING,
                         newEventDto.getTitle(),
-                        0);
+                        0L);
     }
 
     public static EventFullDto toFullDto(Event event) {

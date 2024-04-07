@@ -7,9 +7,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.service.ServiceEvent;
+import ru.practicum.ewm.util.requests.EventsPublicRequest;
+import ru.practicum.ewm.util.requests.EwmRequestParams;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
 import java.time.LocalDateTime;
@@ -24,28 +25,38 @@ public class EventControllerPublicApi {
     private final ServiceEvent service;
 
     @GetMapping
-    public List<EventFullDto> getEvents(@RequestParam String text,
-                                        @RequestParam(required = false) List<Long> categories,
-                                        @RequestParam Boolean paid,
-                                        @RequestParam(required = false)
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
-                                        @RequestParam(required = false)
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")LocalDateTime rangeEnd,
-                                        @RequestParam(defaultValue = "false") boolean onlyAvailable,
-                                        @RequestParam @NotNull String sort,
-                                        @RequestParam(defaultValue = "0")
-                                            @PositiveOrZero(message = "Отрицательное значение " +
-                                                    "параметра 'from'") int from,
-                                        @RequestParam(defaultValue = "10")
-                                            @Positive(message = "Значение параметра 'size' - " +
-                                                    "0 или отрицательное") int size) {
+    public List<EventFullDto> getEventsPublic(@RequestParam(required = false) String text,
+                                              @RequestParam(required = false) List<Long> categories,
+                                              @RequestParam(required = false) Boolean paid,
+                                              @RequestParam(required = false)
+                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                                  @RequestParam(required = false)
+                                              @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                                  @RequestParam(defaultValue = "false") boolean onlyAvailable,
+                                              @RequestParam(defaultValue = "EVENT_DATE") String sort,
+                                              @RequestParam(defaultValue = "0")
+                                                 @PositiveOrZero(message = "Отрицательное значение " +
+                                                                            "параметра 'from'") int from,
+                                             @RequestParam(defaultValue = "10")
+                                                 @Positive(message = "Значение параметра 'size' - " +
+                                                                      "0 или отрицательное") int size,
+                                            HttpServletRequest httpServletRequest) {
         log.info("Публичный запрос на поиск событий по параметрам");
-        return null;
+        if (!(sort.equals("EVENT_DATE") || sort.equals("VIEWS"))) {
+            throw new IllegalArgumentException("Неверный параметр сортировки! Правильные варианты: EVENT_DATE, VIEWS");
+        }
+
+        EwmRequestParams page = new EwmRequestParams(from, size, sort);
+        EventsPublicRequest eventsPublicRequest = new EventsPublicRequest(text, categories, paid, rangeStart, rangeEnd,
+                                                                          onlyAvailable, page);
+
+        return service.getEventsPublic(eventsPublicRequest, httpServletRequest);
     }
 
     @GetMapping("/{id}")
-    public EventFullDto getEvent(@PathVariable Long id, HttpServletRequest request) {
+    public EventFullDto getEventPublic(@PathVariable Long id, HttpServletRequest httpServletRequest) {
         log.info("Публичный запрос на получение события по id = " + id);
-        return null;
+        return service.getEventPublic(id, httpServletRequest);
     }
+
 }

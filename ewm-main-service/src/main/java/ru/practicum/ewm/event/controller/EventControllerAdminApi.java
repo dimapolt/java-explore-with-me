@@ -10,7 +10,7 @@ import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
 import ru.practicum.ewm.event.model.status.EventState;
 import ru.practicum.ewm.event.service.ServiceEvent;
 import ru.practicum.ewm.util.requests.EventsAdminRequest;
-import ru.practicum.ewm.util.requests.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequestParams;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -26,7 +26,7 @@ import java.util.List;
 public class EventControllerAdminApi {
     private final ServiceEvent service;
     @GetMapping
-    public List<EventFullDto> getEvents(@RequestParam(required = false) List<Long> users,
+    public List<EventFullDto> getEventsAdmin(@RequestParam(required = false) List<Long> users,
                                         @RequestParam(required = false) List<EventState> states,
                                         @RequestParam(required = false) List<Long> categories,
                                         @RequestParam(required = false)
@@ -40,14 +40,14 @@ public class EventControllerAdminApi {
                                         @Positive(message = "Значение параметра 'size' - " +
                                                 "0 или отрицательное") int size) {
         log.info("Запрос на получение списка событий администратором");
-        EwmRequest ewmRequest = new EwmRequest(from, size);
+        EwmRequestParams ewmRequestParams = new EwmRequestParams(from, size);
         EventsAdminRequest eventsAdminRequest = new EventsAdminRequest(users, states, categories,
-                                                                       rangeStart, rangeEnd, ewmRequest);
+                                                                       rangeStart, rangeEnd, ewmRequestParams);
         return service.getEventsAdmin(eventsAdminRequest);
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto updateEvent(@PathVariable Long eventId,
+    public EventFullDto updateEventAdmin(@PathVariable Long eventId,
                                     @RequestBody @Valid UpdateEventAdminRequest eventAdminDto) {
         log.info("Запрос на обновление события администратором");
         return service.updateEventAdmin(eventId, eventAdminDto);

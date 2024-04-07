@@ -31,5 +31,5 @@ public class EventFullDto {
     private EventState state;
     @Size(min = 3, max = 120, message = "Неверная длина поля 'title' (верно - >3 и <120)!")
     private String title;
-    private Integer views;
+    private Long views;
 }
