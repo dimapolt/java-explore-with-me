@@ -8,12 +8,12 @@ import ru.practicum.ewm.event.model.Location;
 public class LocationMapper {
     public static Location toEntity(LocationDto locationDto) {
         return new Location(null,
-                            locationDto.getLat(),
-                            locationDto.getLon());
+                locationDto.getLat(),
+                locationDto.getLon());
     }
 
     public static LocationDto toDto(Location location) {
         return new LocationDto(location.getLat(),
-                               location.getLon());
+                location.getLon());
     }
 }

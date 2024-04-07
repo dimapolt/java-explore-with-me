@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static ru.practicum.ewm.request.dto.mapper.RequestMapper.*;
+import static ru.practicum.ewm.request.dto.mapper.RequestMapper.toDto;
 
 @Service
 @RequiredArgsConstructor

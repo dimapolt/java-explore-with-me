@@ -10,6 +10,6 @@ import ru.practicum.ewm.event.model.status.EvenStateAdmin;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateEventAdminRequest extends UpdateEventDto{
+public class UpdateEventAdminRequest extends UpdateEventDto {
     private EvenStateAdmin stateAction;
 }

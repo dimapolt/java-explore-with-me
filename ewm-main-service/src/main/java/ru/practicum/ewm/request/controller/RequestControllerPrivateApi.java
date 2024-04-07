@@ -19,7 +19,7 @@ public class RequestControllerPrivateApi {
 
     @PostMapping
     public RequestDto createRequest(@PathVariable Long userId,
-                                    @RequestParam Long eventId) {
+                                    @RequestParam(required = false) Long eventId) {
         log.info("Запрос на участие в событии с id = " + eventId + ", от пользователя с id = " + userId);
         return requestService.createRequest(userId, eventId);
     }

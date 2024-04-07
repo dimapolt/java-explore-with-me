@@ -25,30 +25,31 @@ import java.util.List;
 @Validated
 public class EventControllerAdminApi {
     private final ServiceEvent service;
+
     @GetMapping
     public List<EventFullDto> getEventsAdmin(@RequestParam(required = false) List<Long> users,
-                                        @RequestParam(required = false) List<EventState> states,
-                                        @RequestParam(required = false) List<Long> categories,
-                                        @RequestParam(required = false)
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")LocalDateTime rangeStart,
-                                        @RequestParam(required = false)
-                                            @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")LocalDateTime rangeEnd,
-                                        @RequestParam(defaultValue = "0")
-                                        @PositiveOrZero(message = "Отрицательное значение " +
-                                                "параметра 'from'") int from,
-                                        @RequestParam(defaultValue = "10")
-                                        @Positive(message = "Значение параметра 'size' - " +
-                                                "0 или отрицательное") int size) {
+                                             @RequestParam(required = false) List<EventState> states,
+                                             @RequestParam(required = false) List<Long> categories,
+                                             @RequestParam(required = false)
+                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeStart,
+                                             @RequestParam(required = false)
+                                             @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime rangeEnd,
+                                             @RequestParam(defaultValue = "0")
+                                             @PositiveOrZero(message = "Отрицательное значение " +
+                                                     "параметра 'from'") int from,
+                                             @RequestParam(defaultValue = "10")
+                                             @Positive(message = "Значение параметра 'size' - " +
+                                                     "0 или отрицательное") int size) {
         log.info("Запрос на получение списка событий администратором");
         EwmRequestParams ewmRequestParams = new EwmRequestParams(from, size);
         EventsAdminRequest eventsAdminRequest = new EventsAdminRequest(users, states, categories,
-                                                                       rangeStart, rangeEnd, ewmRequestParams);
+                rangeStart, rangeEnd, ewmRequestParams);
         return service.getEventsAdmin(eventsAdminRequest);
     }
 
     @PatchMapping("/{eventId}")
     public EventFullDto updateEventAdmin(@PathVariable Long eventId,
-                                    @RequestBody @Valid UpdateEventAdminRequest eventAdminDto) {
+                                         @RequestBody @Valid UpdateEventAdminRequest eventAdminDto) {
         log.info("Запрос на обновление события администратором");
         return service.updateEventAdmin(eventId, eventAdminDto);
     }

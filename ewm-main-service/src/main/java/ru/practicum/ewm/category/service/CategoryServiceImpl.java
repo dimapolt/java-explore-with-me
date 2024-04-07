@@ -13,7 +13,8 @@ import ru.practicum.ewm.util.requests.EwmRequestParams;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.ewm.category.dto.CategoryMapper.*;
+import static ru.practicum.ewm.category.dto.CategoryMapper.toDto;
+import static ru.practicum.ewm.category.dto.CategoryMapper.toEntity;
 
 @Service
 @RequiredArgsConstructor

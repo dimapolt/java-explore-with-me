@@ -1,9 +1,6 @@
 package ru.practicum.ewm.event.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import ru.practicum.ewm.user.dto.UserShortDto;
 
 import java.time.LocalDateTime;
@@ -12,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class EventShortDto {
     private long id;
     private String annotation;
@@ -21,5 +19,5 @@ public class EventShortDto {
     private UserShortDto initiator;
     private boolean paid;
     private String title;
-    private int views;
+    private Long views;
 }

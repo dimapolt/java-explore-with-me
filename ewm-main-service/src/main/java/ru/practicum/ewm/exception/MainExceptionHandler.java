@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -56,8 +55,8 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> onConstraintValidationException(
             ConstraintViolationException e) {
-        List<Object> response = e.getConstraintViolations().stream()
-                .map(ConstraintViolation::getMessage)
+        List<ErrorDescription> response = e.getConstraintViolations().stream()
+                .map(er -> new ErrorDescription(HttpStatus.BAD_REQUEST, "", er.getMessage(), LocalDateTime.now()))
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
@@ -76,17 +75,20 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> catchIllegalArgumentException(IllegalArgumentException exception) {
+    public ResponseEntity<ErrorDescription> catchIllegalArgumentException(IllegalArgumentException exception) {
         log.warn(exception.getMessage());
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        ErrorDescription error = new ErrorDescription(HttpStatus.BAD_REQUEST, "",
+                exception.getMessage(),
+                LocalDateTime.now());
+        return new ResponseEntity<>(error, error.getStatus());
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorDescription> catchSQLException(SQLException exception) {
         ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT,
-                                                            "",
-                                                            exception.getMessage(),
-                                                            LocalDateTime.now());
+                "",
+                exception.getMessage(),
+                LocalDateTime.now());
 
         return new ResponseEntity<>(description, description.getStatus());
     }

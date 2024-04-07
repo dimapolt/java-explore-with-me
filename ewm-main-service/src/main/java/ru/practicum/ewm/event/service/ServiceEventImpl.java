@@ -19,10 +19,10 @@ import ru.practicum.ewm.event.storage.EventStorage;
 import ru.practicum.ewm.exception.NoDataFoundException;
 import ru.practicum.ewm.exception.WrongDataException;
 import ru.practicum.ewm.request.storage.RequestStorage;
+import ru.practicum.ewm.util.EwmValidationService;
 import ru.practicum.ewm.util.requests.EventsAdminRequest;
 import ru.practicum.ewm.util.requests.EventsPublicRequest;
 import ru.practicum.ewm.util.requests.EwmRequestParams;
-import ru.practicum.ewm.util.EwmValidationService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -217,13 +217,13 @@ public class ServiceEventImpl implements ServiceEvent {
 
     private void updateViews(Event event, List<String> uris) {
         ObjectMapper objectMapper = new ObjectMapper();
-        ResponseEntity<Object> response =  statClient.getStats(LocalDateTime.MIN,
+        ResponseEntity<Object> response = statClient.getStats(LocalDateTime.MIN,
                 LocalDateTime.MAX, uris, true);
 
         List<StatDtoOut> stats = objectMapper.convertValue(response.getBody(), new TypeReference<>() {
         });
 
-       event.setViews(stats.get(0).getHits());
+        event.setViews(stats.get(0).getHits());
 
     }
 
