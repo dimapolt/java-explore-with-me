@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.user.dto.UserDto;
 import ru.practicum.ewm.user.dto.NewUserRequest;
 import ru.practicum.ewm.user.service.UserService;
-import ru.practicum.ewm.util.requests.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequestParams;
 import ru.practicum.ewm.util.EwmValidate;
 
 import javax.validation.Valid;
@@ -40,7 +40,7 @@ public class UserControllerAdminApi {
                                       @Positive(message = "Значение параметра 'size' - " +
                                                           "0 или отрицательное") int size) {
         log.info("Запрос на получение пользователей по списку id, с {} по {} элементов", from, size);
-        return service.getUsers(ids, new EwmRequest(from, size));
+        return service.getUsers(ids, new EwmRequestParams(from, size));
     }
 
     @DeleteMapping("/{userId}")

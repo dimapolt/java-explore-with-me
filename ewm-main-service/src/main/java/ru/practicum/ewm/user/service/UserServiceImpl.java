@@ -11,7 +11,7 @@ import ru.practicum.ewm.user.dto.NewUserRequest;
 import ru.practicum.ewm.user.dto.mapper.UserMapper;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.user.storage.UserStorage;
-import ru.practicum.ewm.util.requests.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequestParams;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public List<UserDto> getUsers(List<Long> ids, EwmRequest params) {
+    public List<UserDto> getUsers(List<Long> ids, EwmRequestParams params) {
         Pageable pageable = params.getPageable();
         List<User> users;
 

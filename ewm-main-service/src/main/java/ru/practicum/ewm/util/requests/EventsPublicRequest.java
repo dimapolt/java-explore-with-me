@@ -1,17 +1,17 @@
 package ru.practicum.ewm.util.requests;
 
 import lombok.Data;
-import ru.practicum.ewm.event.model.status.EventState;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-public class EventsAdminRequest {
-    private final List<Long> users;
-    private final List<EventState> states;
+public class EventsPublicRequest {
+    private final String text;
     private final List<Long> categories;
+    private final Boolean paid;
     private final LocalDateTime rangeStart;
     private final LocalDateTime rangeEnd;
+    private final Boolean onlyAvailable;
     private final EwmRequestParams page;
 }

@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.category.dto.CategoryDto;
 import ru.practicum.ewm.category.service.CategoryService;
-import ru.practicum.ewm.util.requests.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequestParams;
 
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -28,7 +28,7 @@ public class CategoryControllerPublicApi {
                                                @Positive(message = "Значение параметра 'size' " +
                                                                    "0 или отрицательное") int size) {
         log.info("Запрос на получение категорий с {} по {} элементов", from, size);
-        return service.getCategories(new EwmRequest(from, size));
+        return service.getCategories(new EwmRequestParams(from, size));
     }
 
     @GetMapping("/{catId}")

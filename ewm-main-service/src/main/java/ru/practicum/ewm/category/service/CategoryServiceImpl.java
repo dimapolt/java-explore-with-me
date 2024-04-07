@@ -8,7 +8,7 @@ import ru.practicum.ewm.category.dto.CategoryMapper;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.category.storage.CategoryStorage;
 import ru.practicum.ewm.exception.NoDataFoundException;
-import ru.practicum.ewm.util.requests.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequestParams;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,7 +47,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public List<CategoryDto> getCategories(EwmRequest request) {
+    public List<CategoryDto> getCategories(EwmRequestParams request) {
         List<Category> categories = storage.findAll(request.getPageable()).getContent();
         return categories.stream()
                 .map(CategoryMapper::toDto)

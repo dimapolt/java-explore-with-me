@@ -9,7 +9,7 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.service.ServiceEvent;
-import ru.practicum.ewm.util.requests.EwmRequest;
+import ru.practicum.ewm.util.requests.EwmRequestParams;
 import ru.practicum.ewm.util.EwmValidate;
 
 import javax.validation.Valid;
@@ -28,14 +28,14 @@ public class EventControllerPrivateApi {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Validated({EwmValidate.OnCreate.class})
-    public EventFullDto createEvent(@RequestBody @Valid NewEventDto eventDto,
+    public EventFullDto createEventPrivate(@RequestBody @Valid NewEventDto eventDto,
                                     @PathVariable Long userId) {
         log.info("Запрос на создание события");
         return service.createEventPrivate(eventDto, userId);
     }
 
     @GetMapping
-    public List<EventFullDto> getEvents(@PathVariable Long userId,
+    public List<EventFullDto> getEventsPrivate(@PathVariable Long userId,
                                         @RequestParam(defaultValue = "0")
                                             @PositiveOrZero(message = "Отрицательное значение " +
                                                                       "параметра 'from'") int from,
@@ -43,18 +43,18 @@ public class EventControllerPrivateApi {
                                             @Positive(message = "Значение параметра 'size' - " +
                                                                 "0 или отрицательное") int size) {
         log.info("Запрос на получение списка событий");
-        return service.getEventsPrivate(userId, new EwmRequest(from, size));
+        return service.getEventsPrivate(userId, new EwmRequestParams(from, size));
     }
 
     @GetMapping("/{eventId}")
-    public EventFullDto getEvent(@PathVariable Long userId,
+    public EventFullDto getEventPrivate(@PathVariable Long userId,
                                  @PathVariable Long eventId) {
         log.info("Запрос на получение события с id = " + eventId);
         return service.getEventPrivate(userId, eventId);
     }
 
     @PatchMapping("/{eventId}")
-    public EventFullDto updateEvent(@RequestBody @Valid UpdateEventUserRequest eventDto,
+    public EventFullDto updateEventPrivate(@RequestBody @Valid UpdateEventUserRequest eventDto,
                                     @PathVariable Long userId,
                                     @PathVariable Long eventId) {
         log.info("Запрос на обновление события");
