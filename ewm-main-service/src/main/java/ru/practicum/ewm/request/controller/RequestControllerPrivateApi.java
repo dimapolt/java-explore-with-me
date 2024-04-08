@@ -2,6 +2,7 @@ package ru.practicum.ewm.request.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.request.dto.RequestDto;
@@ -18,6 +19,7 @@ public class RequestControllerPrivateApi {
     private final RequestService requestService;
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public RequestDto createRequest(@PathVariable Long userId,
                                     @RequestParam(required = false) Long eventId) {
         log.info("Запрос на участие в событии с id = " + eventId + ", от пользователя с id = " + userId);

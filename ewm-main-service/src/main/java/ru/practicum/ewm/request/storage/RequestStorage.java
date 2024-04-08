@@ -12,9 +12,13 @@ public interface RequestStorage extends JpaRepository<Request, Long> {
 
     List<Request> findAllByRequesterId(Long requesterId);
 
+    List<Request> findAllByEventId(Long eventId);
+
+    List<Request> findAllByIdIn(List<Long> eventIds);
+
     @Query("SELECT COUNT(r.requester)\n" +
             "FROM Request r\n" +
-            "WHERE r.event = ?1 AND r.status = 'CONFIRMED'")
-    Integer getConfirmedRequests(Long eventId);
+            "WHERE r.event.id = ?1 AND r.status = 'CONFIRMED'")
+    Optional<Integer> getConfirmedRequests(Long eventId);
 
 }

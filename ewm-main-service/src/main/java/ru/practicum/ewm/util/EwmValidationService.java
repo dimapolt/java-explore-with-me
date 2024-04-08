@@ -86,4 +86,10 @@ public class EwmValidationService {
             throw new WrongDataException("До события осталось меньше " + hours + " часов, " + date);
         }
     }
+
+    public void checkStartEnd(LocalDateTime start, LocalDateTime end) {
+        if (start.isAfter(end)) {
+            throw new IllegalArgumentException("Начало периода после окончания");
+        }
+    }
 }

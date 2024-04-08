@@ -34,10 +34,9 @@ public interface StatStorage extends JpaRepository<Stat, Long> {
 
     @Query("SELECT new ru.practicum.ewm.dto.StatDtoOut(st.app, st.uri, COUNT(DISTINCT st.ip)) " +
             "FROM Stat as st " +
-            "WHERE st.timestamp BETWEEN ?1 AND ?2 " +
+            "WHERE (st.timestamp BETWEEN ?1 AND ?2) " +
             "AND st.uri IN ?3 " +
             "GROUP BY st.app, st.uri " +
             "ORDER BY count(st.ip) DESC")
     List<StatDtoOut> findByUrisAndUnique(LocalDateTime start, LocalDateTime end, List<String> uris);
-
 }

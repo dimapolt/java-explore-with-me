@@ -9,6 +9,9 @@ import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
 import ru.practicum.ewm.event.service.ServiceEvent;
+import ru.practicum.ewm.request.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.ewm.request.dto.EventRequestStatusUpdateResult;
+import ru.practicum.ewm.request.dto.RequestDto;
 import ru.practicum.ewm.util.EwmValidate;
 import ru.practicum.ewm.util.requests.EwmRequestParams;
 
@@ -54,10 +57,27 @@ public class EventControllerPrivateApi {
     }
 
     @PatchMapping("/{eventId}")
+    @Validated({EwmValidate.OnUpdate.class})
     public EventFullDto updateEventPrivate(@RequestBody @Valid UpdateEventUserRequest eventDto,
                                            @PathVariable Long userId,
                                            @PathVariable Long eventId) {
         log.info("Запрос на обновление события");
         return service.updateEventPrivate(eventDto, userId, eventId);
     }
+
+    @GetMapping("/{eventId}/requests")
+    public List<RequestDto> getRequestsEventPrivate(@PathVariable Long userId,
+                                             @PathVariable Long eventId) {
+        log.info("Запрос на получение всех запросов на участие в событии");
+        return service.getRequestsEventPrivate(userId, eventId);
+    }
+
+    @PatchMapping("/{eventId}/requests")
+    public EventRequestStatusUpdateResult changeRequestStatusPrivate(@PathVariable Long userId,
+                                          @PathVariable Long eventId,
+                                          @RequestBody EventRequestStatusUpdateRequest requestDto) {
+        log.info("Запрос на изменение статуса запроса на участие в событии");
+        return service.changeRequestStatusPrivate(userId, eventId, requestDto);
+    }
+
 }

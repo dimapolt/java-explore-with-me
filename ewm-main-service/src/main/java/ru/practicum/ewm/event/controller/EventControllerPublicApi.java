@@ -42,7 +42,11 @@ public class EventControllerPublicApi {
                                                       "0 или отрицательное") int size,
                                               HttpServletRequest httpServletRequest) {
         log.info("Публичный запрос на поиск событий по параметрам");
-        if (!(sort.equals("EVENT_DATE") || sort.equals("VIEWS"))) {
+        if (sort.equals("EVENT_DATE")) {
+            sort = "eventDate";
+        } else if (sort.equals("VIEWS")) {
+            sort = "views";
+        } else {
             throw new IllegalArgumentException("Неверный параметр сортировки! Правильные варианты: EVENT_DATE, VIEWS");
         }
 
