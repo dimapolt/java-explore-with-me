@@ -13,6 +13,7 @@ import ru.practicum.ewm.util.StatRequest;
 
 import javax.validation.Valid;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @RestController
@@ -30,11 +31,18 @@ public class StatController {
     }
 
     @GetMapping("/stats")
-    public List<StatDtoOut> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+    public List<StatDtoOut> getStats(@RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
+                                     @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
                                      @RequestParam(defaultValue = "") List<String> uris,
                                      @RequestParam(defaultValue = "false") boolean unique) {
         log.info("Запрос на получение статистики");
+        if (start == null) {
+            start = LocalDateTime.now().minusYears(10);
+        }
+        if (end == null) {
+            end = LocalDateTime.now().plusYears(10);
+        }
+
         return service.getStats(new StatRequest(start, end, uris, unique));
     }
 }

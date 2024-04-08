@@ -1,9 +1,11 @@
 package ru.practicum.ewm.event.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.format.annotation.DateTimeFormat;
 import ru.practicum.ewm.category.model.Category;
 import ru.practicum.ewm.event.model.status.EventState;
 import ru.practicum.ewm.user.model.User;
@@ -25,9 +27,13 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category")
     private Category category;
-    private int confirmedRequests;
+    @Column(name = "confirmed_requests")
+    private Integer confirmedRequests;
+    @Column(name = "created_on")
     private LocalDateTime createdOn;
     private String description;
+    @Column(name = "event_date")
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime eventDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "initiator")
@@ -35,10 +41,13 @@ public class Event {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location")
     private Location location;
-    private boolean paid;
-    private int participantLimit;
+    private Boolean paid;
+    @Column(name = "participant_limit")
+    private Integer participantLimit;
+    @Column(name = "published_on")
     private LocalDateTime publishedOn;
-    private boolean requestModeration;
+    @Column(name = "request_moderation")
+    private Boolean requestModeration;
     @Enumerated(EnumType.STRING)
     private EventState state;
     private String title;

@@ -48,11 +48,23 @@ public class RequestServiceImpl implements RequestService {
             throw new WrongDataException("Пользователь отправляет заявку на своё событие");
         }
 
-        if (event.getParticipantLimit() != 0 && event.getConfirmedRequests() == event.getParticipantLimit()) {
+        int confirmedRequest = storage.getConfirmedRequests(eventId).orElse(0);
+
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit().equals(confirmedRequest)) {
             throw new WrongDataException("Достигнуто ограничение на число заявок у данного события");
         }
 
-        ReqStatus status = event.isRequestModeration() ? ReqStatus.PENDING : ReqStatus.CONFIRMED;
+        ReqStatus status;
+
+        if (event.getRequestModeration()) {
+            status = ReqStatus.PENDING;
+        } else {
+            status = ReqStatus.CONFIRMED;
+        }
+        if (event.getParticipantLimit() == 0) {
+            status = ReqStatus.CONFIRMED;
+        }
+
         Request request = new Request(null, LocalDateTime.now(), event, requester, status);
 
         return toDto(storage.save(request));

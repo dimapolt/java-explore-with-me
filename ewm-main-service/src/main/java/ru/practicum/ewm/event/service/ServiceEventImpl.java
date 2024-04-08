@@ -1,9 +1,6 @@
 package ru.practicum.ewm.event.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.ewm.category.model.Category;
@@ -18,6 +15,12 @@ import ru.practicum.ewm.event.model.status.EventState;
 import ru.practicum.ewm.event.storage.EventStorage;
 import ru.practicum.ewm.exception.NoDataFoundException;
 import ru.practicum.ewm.exception.WrongDataException;
+import ru.practicum.ewm.request.dto.EventRequestStatusUpdateRequest;
+import ru.practicum.ewm.request.dto.EventRequestStatusUpdateResult;
+import ru.practicum.ewm.request.dto.RequestDto;
+import ru.practicum.ewm.request.dto.mapper.RequestMapper;
+import ru.practicum.ewm.request.model.Request;
+import ru.practicum.ewm.request.model.status.ReqStatus;
 import ru.practicum.ewm.request.storage.RequestStorage;
 import ru.practicum.ewm.util.EwmValidationService;
 import ru.practicum.ewm.util.requests.EventsAdminRequest;
@@ -26,6 +29,8 @@ import ru.practicum.ewm.util.requests.EwmRequestParams;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +51,7 @@ public class ServiceEventImpl implements ServiceEvent {
     public EventFullDto createEventPrivate(NewEventDto eventDto, Long userId) {
         Event event = toEntity(eventDto, userId);
         validation.formEvent(event);
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(event.getId()).orElse(0));
 
         return toFullDto(storage.save(event));
     }
@@ -55,6 +61,8 @@ public class ServiceEventImpl implements ServiceEvent {
     public List<EventFullDto> getEventsPrivate(Long userId, EwmRequestParams request) {
         validation.checkUserExists(userId);
         List<Event> events = storage.findAllByInitiatorId(userId, request.getPageable());
+        events.forEach(event ->
+                event.setConfirmedRequests(requestStorage.getConfirmedRequests(event.getId()).orElse(0)));
 
         return events.stream()
                 .map(EventMapper::toFullDto)
@@ -65,7 +73,8 @@ public class ServiceEventImpl implements ServiceEvent {
     @Transactional
     public EventFullDto getEventPrivate(Long userId, Long eventId) {
         validation.checkUserExists(userId);
-        Event event = searchEvent(eventId, userId);
+        Event event = searchEvent(userId, eventId);
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0));
 
         return toFullDto(event);
     }
@@ -73,7 +82,7 @@ public class ServiceEventImpl implements ServiceEvent {
     @Override
     @Transactional
     public EventFullDto updateEventPrivate(UpdateEventUserRequest eventDto, Long userId, Long eventId) {
-        Event event = searchEvent(userId, eventId);
+        Event event = searchEvent(eventId, userId);
 
         if (event.getState().equals(EventState.PUBLISHED)) {
             throw new WrongDataException("Изменить можно только отмененные события или события в состоянии ожидания");
@@ -92,18 +101,74 @@ public class ServiceEventImpl implements ServiceEvent {
         }
 
         updateEventFields(eventDto, event);
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0));
+
         return toFullDto(event);
+    }
+
+    @Override
+    public List<RequestDto> getRequestsEventPrivate(Long userId, Long eventId) {
+        searchEvent(eventId, userId);
+
+        List<Request> requests = requestStorage.findAllByEventId(eventId);
+        return requests.stream()
+                .map(RequestMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public EventRequestStatusUpdateResult changeRequestStatusPrivate(Long userId, Long eventId,
+                                                                     EventRequestStatusUpdateRequest requestDto) {
+        Event event = searchEvent(eventId, userId);
+
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0));
+
+        if (event.getParticipantLimit() != 0 && event.getConfirmedRequests() >= event.getParticipantLimit()) {
+            throw new WrongDataException("Превышен лимит заявок");
+        }
+
+        EventRequestStatusUpdateResult resultUpdate = new EventRequestStatusUpdateResult();
+
+        List<RequestDto> requests = requestStorage.findAllByIdIn(requestDto.getRequestIds()).stream()
+                .map(RequestMapper::toDto)
+                .collect(Collectors.toList());
+
+        if (requestDto.getStatus().equals(ReqStatus.CONFIRMED)) {
+            requests.forEach(request -> request.setStatus(ReqStatus.CONFIRMED));
+            resultUpdate.setConfirmedRequests(requests);
+        } else if (requestDto.getStatus().equals(ReqStatus.REJECTED)) {
+            requests.forEach(request -> request.setStatus(ReqStatus.REJECTED));
+            resultUpdate.setRejectedRequests(requests);
+        }
+
+        return resultUpdate;
     }
 
     @Override
     @Transactional
     public List<EventFullDto> getEventsAdmin(EventsAdminRequest params) {
+        LocalDateTime start = params.getRangeStart();
+        LocalDateTime end = params.getRangeEnd();
+
+        if (start == null) {
+            start = LocalDateTime.now().minusYears(10);
+        }
+
+        if (end == null) {
+            end = LocalDateTime.now().plusYears(10);
+        }
+
+        validation.checkStartEnd(start, end);
+
         List<Event> events = storage.findEventsForAdmin(params.getUsers(),
                 params.getStates(),
                 params.getCategories(),
-                params.getRangeStart(),
-                params.getRangeEnd(),
+                start,
+                end,
                 params.getPage().getPageable());
+
+        events.forEach(event ->
+                event.setConfirmedRequests(requestStorage.getConfirmedRequests(event.getId()).orElse(0)));
 
         return events.stream()
                 .map(EventMapper::toFullDto)
@@ -141,40 +206,61 @@ public class ServiceEventImpl implements ServiceEvent {
         }
 
         updateEventFields(eventDto, event);
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0));
         return toFullDto(storage.save(event));
     }
 
     @Override
     @Transactional
-    public List<EventFullDto> getEventsPublic(EventsPublicRequest eventsPublicRequest, HttpServletRequest request) {
-        return null;
+    public List<EventFullDto> getEventsPublic(EventsPublicRequest params, HttpServletRequest request) {
+        sendStat(request);
+
+        LocalDateTime start = params.getRangeStart();
+        LocalDateTime end = params.getRangeEnd();
+
+        if (start == null) {
+            start = LocalDateTime.now().minusYears(10);
+        }
+        if (end == null) {
+            end = LocalDateTime.now().plusYears(10);
+        }
+
+        List<Event> events = storage.findEventsForPublic(params.getText(), params.getCategories(), params.getPaid(),
+                start, end,
+                params.getOnlyAvailable(), params.getPage().getPageable());
+
+
+        events.forEach(event -> event.setConfirmedRequests(
+                requestStorage.getConfirmedRequests(event.getId()).orElse(0)));
+
+        return events.stream()
+                .map(EventMapper::toFullDto)
+                .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
     public EventFullDto getEventPublic(Long id, HttpServletRequest request) {
+        sendStat(request);
+
         Event event = storage.findById(id).orElseThrow(() -> new NoDataFoundException("Событие не найдено"));
 
         if (!event.getState().equals(EventState.PUBLISHED)) {
-            throw new WrongDataException("Событие не опубликовано");
+            throw new NoDataFoundException("Событие не опубликовано");
         }
-        StatDtoIn statDtoIn = new StatDtoIn("ewm-main-service", request.getRequestURI(),
-                request.getRemoteAddr(), LocalDateTime.now());
 
-        event.setConfirmedRequests(requestStorage.getConfirmedRequests(id));
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(id).orElse(0));
         updateViews(event, List.of(request.getRequestURI()));
-
-        statClient.addStat(statDtoIn);
 
         return toFullDto(event);
     }
 
-    private Event searchEvent(Long id, Long userId) {
-        Event event = storage.findById(id).orElseThrow(() -> new NoDataFoundException("Событие не найдено"));
+    private Event searchEvent(Long eventId, Long userId) {
+        Event event = storage.findById(eventId).orElseThrow(() -> new NoDataFoundException("Событие не найдено"));
 
         if (!event.getInitiator().getId().equals(userId)) {
             throw new IllegalArgumentException("Пользователь с id = " + userId +
-                    " не добавлял событие с id = " + id);
+                    " не добавлял событие с id = " + eventId);
         }
 
         return event;
@@ -216,16 +302,22 @@ public class ServiceEventImpl implements ServiceEvent {
     }
 
     private void updateViews(Event event, List<String> uris) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        ResponseEntity<Object> response = statClient.getStats(LocalDateTime.MIN,
-                LocalDateTime.MAX, uris, true);
+        List<StatDtoOut> stats = statClient.getStats(LocalDateTime.now().minusYears(10),
+                LocalDateTime.now().plusYears(10), uris, true).getBody();
 
-        List<StatDtoOut> stats = objectMapper.convertValue(response.getBody(), new TypeReference<>() {
-        });
+        if (stats != null) {
+            if (stats.size() > 0) {
+                event.setViews(stats.get(0).getHits());
+            }
+        }
 
-        event.setViews(stats.get(0).getHits());
-
+        storage.save(event);
     }
 
+    private void sendStat(HttpServletRequest request) {
+        StatDtoIn statDtoIn = new StatDtoIn("ewm-main-service", request.getRequestURI(),
+                request.getRemoteAddr(), LocalDateTime.now());
+        statClient.addStat(statDtoIn);
+    }
 
 }

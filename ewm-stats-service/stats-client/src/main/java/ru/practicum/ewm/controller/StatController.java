@@ -8,6 +8,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.client.StatClient;
 import ru.practicum.ewm.dto.StatDtoIn;
+import ru.practicum.ewm.dto.StatDtoOut;
 import ru.practicum.ewm.dto.StatValidate;
 
 import javax.validation.Valid;
@@ -29,10 +30,10 @@ public class StatController {
     }
 
     @GetMapping("/stats")
-    public ResponseEntity<Object> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
-                                           @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
-                                           @RequestParam(defaultValue = "") List<String> uris,
-                                           @RequestParam(defaultValue = "false") boolean unique) {
+    public ResponseEntity<List<StatDtoOut>> getStats(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start,
+                                                     @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end,
+                                                     @RequestParam(defaultValue = "") List<String> uris,
+                                                     @RequestParam(defaultValue = "false") boolean unique) {
         log.info("Запрос на получение статистики");
         return statClient.getStats(start, end, uris, unique);
     }
