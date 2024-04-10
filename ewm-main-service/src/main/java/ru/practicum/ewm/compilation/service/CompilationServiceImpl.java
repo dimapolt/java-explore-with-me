@@ -12,6 +12,7 @@ import ru.practicum.ewm.compilation.storage.CompilationStorage;
 import ru.practicum.ewm.event.model.Event;
 import ru.practicum.ewm.event.storage.EventStorage;
 import ru.practicum.ewm.exception.NoDataFoundException;
+import ru.practicum.ewm.exception.WrongDataException;
 import ru.practicum.ewm.util.requests.EwmRequestParams;
 
 import java.util.HashSet;
@@ -30,7 +31,17 @@ public class CompilationServiceImpl implements CompilationService {
     @Override
     @Transactional
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
-        Set<Event> events = new HashSet<>(eventStorage.findAllById(newCompilationDto.getEvents()));
+        Set<Event> events;
+
+        if (storage.existsByTitle(newCompilationDto.getTitle())) {
+            throw new WrongDataException("Подборка с таким названием уже есть в базе");
+        }
+
+        if (newCompilationDto.getEvents() != null && newCompilationDto.getEvents().size() != 0) {
+            events = new HashSet<>(eventStorage.findAllById(newCompilationDto.getEvents()));
+        } else {
+            events = new HashSet<>();
+        }
 
         Compilation compilation = new Compilation(null, events,
                 newCompilationDto.getPinned(), newCompilationDto.getTitle());

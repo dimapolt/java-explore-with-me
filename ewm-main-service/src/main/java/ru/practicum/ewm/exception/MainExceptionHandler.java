@@ -40,11 +40,17 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
                                                                   @NonNull HttpHeaders headers,
                                                                   @NonNull HttpStatus status,
                                                                   @NonNull WebRequest request) {
-        List<Object> response = new ArrayList<>();
+        List<ErrorDescription> response = new ArrayList<>();
 
         ex.getBindingResult()
                 .getAllErrors()
-                .forEach((error) -> response.add(error.getDefaultMessage()));
+                .forEach((error) -> response.add(
+                        new ErrorDescription(HttpStatus.BAD_REQUEST,
+                                "",
+                                error.getDefaultMessage(),
+                                LocalDateTime.now()))
+                );
+
 
         log.warn("Ошибка, связанная с невалидными полями");
 
@@ -63,15 +69,19 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> catchAlreadyExistException(AlreadyExistException exception) {
+    public ResponseEntity<ErrorDescription> catchAlreadyExistException(AlreadyExistException exception) {
         log.warn(exception.getMessage());
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+        ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT, "",
+                exception.getMessage(), LocalDateTime.now());
+        return new ResponseEntity<>(description, description.getStatus());
     }
 
     @ExceptionHandler
-    public ResponseEntity<String> catchWrongDataException(WrongDataException exception) {
+    public ResponseEntity<ErrorDescription> catchWrongDataException(WrongDataException exception) {
         log.warn(exception.getMessage());
-        return new ResponseEntity<>(exception.getMessage(), HttpStatus.CONFLICT);
+        ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT, "",
+                exception.getMessage(), LocalDateTime.now());
+        return new ResponseEntity<>(description, description.getStatus());
     }
 
     @ExceptionHandler
@@ -90,6 +100,7 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
                 exception.getMessage(),
                 LocalDateTime.now());
 
+        log.warn("Ошибка, от БД");
         return new ResponseEntity<>(description, description.getStatus());
     }
 }

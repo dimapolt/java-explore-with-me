@@ -29,10 +29,10 @@ public class NewEventDto {
     private LocalDateTime eventDate;
     @NotNull(message = "Пустое поле 'location'", groups = {EwmValidate.OnCreate.class})
     private LocationDto location;
-    private boolean paid = true;
+    private boolean paid = false;
     @PositiveOrZero(message = "Поле 'participantLimit' меньше нуля!")
     private int participantLimit = 0;
-    private boolean requestModeration = false;
+    private boolean requestModeration = true;
     @NotBlank
     @Size(min = 3, max = 120, message = "Неверная длина поля 'title' (верно - >3 и <120)!")
     private String title;

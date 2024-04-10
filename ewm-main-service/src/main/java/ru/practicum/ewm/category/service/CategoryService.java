@@ -8,11 +8,11 @@ import java.util.List;
 public interface CategoryService {
     CategoryDto createCategory(CategoryDto categoryDto);
 
-    CategoryDto updateCategory(CategoryDto categoryDto, long catId);
+    CategoryDto updateCategory(CategoryDto categoryDto, Long catId);
 
-    String deleteCategory(long catId);
+    String deleteCategory(Long catId);
 
     List<CategoryDto> getCategories(EwmRequestParams request);
 
-    CategoryDto getCategory(long catId);
+    CategoryDto getCategory(Long catId);
 }

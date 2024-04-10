@@ -6,13 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.practicum.ewm.event.model.status.EvenStateUser;
 
-import javax.validation.constraints.NotNull;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UpdateEventUserRequest extends UpdateEventDto {
-    @NotNull
     private EvenStateUser stateAction;
 }

@@ -16,7 +16,7 @@ public interface RequestStorage extends JpaRepository<Request, Long> {
 
     List<Request> findAllByIdIn(List<Long> eventIds);
 
-    @Query("SELECT COUNT(r.requester)\n" +
+    @Query("SELECT COUNT(r.id)\n" +
             "FROM Request r\n" +
             "WHERE r.event.id = ?1 AND r.status = 'CONFIRMED'")
     Optional<Integer> getConfirmedRequests(Long eventId);
