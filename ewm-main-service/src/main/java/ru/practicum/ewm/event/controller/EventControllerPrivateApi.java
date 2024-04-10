@@ -67,15 +67,15 @@ public class EventControllerPrivateApi {
 
     @GetMapping("/{eventId}/requests")
     public List<RequestDto> getRequestsEventPrivate(@PathVariable Long userId,
-                                             @PathVariable Long eventId) {
+                                                    @PathVariable Long eventId) {
         log.info("Запрос на получение всех запросов на участие в событии");
         return service.getRequestsEventPrivate(userId, eventId);
     }
 
     @PatchMapping("/{eventId}/requests")
     public EventRequestStatusUpdateResult changeRequestStatusPrivate(@PathVariable Long userId,
-                                          @PathVariable Long eventId,
-                                          @RequestBody EventRequestStatusUpdateRequest requestDto) {
+                                                                     @PathVariable Long eventId,
+                                                                     @RequestBody EventRequestStatusUpdateRequest requestDto) {
         log.info("Запрос на изменение статуса запроса на участие в событии");
         return service.changeRequestStatusPrivate(userId, eventId, requestDto);
     }
