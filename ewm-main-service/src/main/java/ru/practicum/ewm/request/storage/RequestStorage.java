@@ -2,6 +2,7 @@ package ru.practicum.ewm.request.storage;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import ru.practicum.ewm.event.dto.RequestCount;
 import ru.practicum.ewm.request.model.Request;
 
 import java.util.List;
@@ -18,7 +19,13 @@ public interface RequestStorage extends JpaRepository<Request, Long> {
 
     @Query("SELECT COUNT(r.id)\n" +
             "FROM Request r\n" +
-            "WHERE r.event.id = ?1 AND r.status = 'CONFIRMED'")
-    Optional<Integer> getConfirmedRequests(Long eventId);
+            "WHERE r.event.id = :eventId AND r.status = 'CONFIRMED'")
+    Optional<Long> getConfirmedRequests(Long eventId);
+
+    @Query("SELECT new ru.practicum.ewm.event.dto.RequestCount(r.event.id, COUNT(r.id))\n" +
+            "FROM Request r\n" +
+            "WHERE r.event.id IN :eventIds AND r.status = 'CONFIRMED'\n" +
+            "GROUP BY r.event.id")
+    List<RequestCount> getConfirmedRequests(List<Long> eventIds);
 
 }

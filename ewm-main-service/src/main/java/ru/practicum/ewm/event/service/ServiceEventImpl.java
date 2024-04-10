@@ -31,6 +31,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -51,7 +52,7 @@ public class ServiceEventImpl implements ServiceEvent {
     public EventFullDto createEventPrivate(NewEventDto eventDto, Long userId) {
         Event event = toEntity(eventDto, userId);
         validation.formEvent(event);
-        event.setConfirmedRequests(requestStorage.getConfirmedRequests(event.getId()).orElse(0));
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(event.getId()).orElse(0L));
 
         return toFullDto(storage.save(event));
     }
@@ -61,8 +62,8 @@ public class ServiceEventImpl implements ServiceEvent {
     public List<EventFullDto> getEventsPrivate(Long userId, EwmRequestParams request) {
         validation.checkUserExists(userId);
         List<Event> events = storage.findAllByInitiatorId(userId, request.getPageable());
-        events.forEach(event ->
-                event.setConfirmedRequests(requestStorage.getConfirmedRequests(event.getId()).orElse(0)));
+        // Загружаем информацию о количестве подтверждённых запросов
+        setConfirmedRequest(events);
 
         return events.stream()
                 .map(EventMapper::toFullDto)
@@ -74,7 +75,7 @@ public class ServiceEventImpl implements ServiceEvent {
     public EventFullDto getEventPrivate(Long userId, Long eventId) {
         validation.checkUserExists(userId);
         Event event = searchEvent(eventId, userId);
-        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0));
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0L));
 
         return toFullDto(event);
     }
@@ -103,7 +104,7 @@ public class ServiceEventImpl implements ServiceEvent {
         }
 
         updateEventFields(eventDto, event);
-        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0));
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0L));
 
         return toFullDto(event);
     }
@@ -125,7 +126,7 @@ public class ServiceEventImpl implements ServiceEvent {
                                                                      EventRequestStatusUpdateRequest requestDto) {
         Event event = searchEvent(eventId, userId);
 
-        int confirmedReqCount = requestStorage.getConfirmedRequests(eventId).orElse(0);
+        long confirmedReqCount = requestStorage.getConfirmedRequests(eventId).orElse(0L);
         int limit = event.getParticipantLimit();
 
         if (event.getParticipantLimit() != 0 && confirmedReqCount >= limit) {
@@ -212,8 +213,8 @@ public class ServiceEventImpl implements ServiceEvent {
                 end,
                 params.getPage().getPageable());
 
-        events.forEach(event ->
-                event.setConfirmedRequests(requestStorage.getConfirmedRequests(event.getId()).orElse(0)));
+        // Загружаем информацию о количестве подтверждённых запросов
+        setConfirmedRequest(events);
 
         return events.stream()
                 .map(EventMapper::toFullDto)
@@ -244,7 +245,7 @@ public class ServiceEventImpl implements ServiceEvent {
         }
 
         updateEventFields(eventDto, event);
-        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0));
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(eventId).orElse(0L));
         return toFullDto(storage.save(event));
     }
 
@@ -256,8 +257,9 @@ public class ServiceEventImpl implements ServiceEvent {
         LocalDateTime start = params.getRangeStart();
         LocalDateTime end = params.getRangeEnd();
 
+        // Если диапазон дат null, то выгружаем события позже текущей даты
         if (start == null) {
-            start = LocalDateTime.now().minusYears(10);
+            start = LocalDateTime.now();
         }
         if (end == null) {
             end = LocalDateTime.now().plusYears(10);
@@ -266,12 +268,10 @@ public class ServiceEventImpl implements ServiceEvent {
         validation.checkStartEnd(start, end);
 
         List<Event> events = storage.findEventsForPublic(params.getText(), params.getCategories(), params.getPaid(),
-                start, end,
-                params.getOnlyAvailable(), params.getPage().getPageable());
+                start, end, params.getOnlyAvailable(), params.getPage().getPageable());
 
-
-        events.forEach(event -> event.setConfirmedRequests(
-                requestStorage.getConfirmedRequests(event.getId()).orElse(0)));
+        // Загружаем информацию о количестве подтверждённых запросов
+        setConfirmedRequest(events);
 
         return events.stream()
                 .map(EventMapper::toFullDto)
@@ -289,7 +289,7 @@ public class ServiceEventImpl implements ServiceEvent {
             throw new NoDataFoundException("Событие не опубликовано");
         }
 
-        event.setConfirmedRequests(requestStorage.getConfirmedRequests(id).orElse(0));
+        event.setConfirmedRequests(requestStorage.getConfirmedRequests(id).orElse(0L));
         updateViews(event, List.of(request.getRequestURI()));
 
         return toFullDto(event);
@@ -372,13 +372,33 @@ public class ServiceEventImpl implements ServiceEvent {
      */
     private void checkRequests(List<Request> requests, Long eventId) {
         Optional<Request> noValidReq = requests.stream()
-                        .filter(request -> !request.getStatus().equals(ReqStatus.PENDING)
+                .filter(request -> !request.getStatus().equals(ReqStatus.PENDING)
                         || !request.getEvent().getId().equals(eventId))
                 .findFirst();
         if (noValidReq.isPresent()) {
             throw new WrongDataException("У всех запросов должен быть статус 'В ожидании (PENDING)' " +
                     "и они должны принадлежать событию с id = " + eventId);
         }
+    }
+
+    /**
+     * Метод загружает информацию о подтверждённых запросов
+     * сразу для нескольких Event
+     */
+    private void setConfirmedRequest(List<Event> events) {
+        List<Long> eventIds = events.stream()
+                .map(Event::getId)
+                .collect(Collectors.toList());
+
+        List<RequestCount> requestCounts = requestStorage.getConfirmedRequests(eventIds);
+
+        Map<Long, Long> res = requestCounts.stream()
+                .collect(Collectors.toMap(RequestCount::getEventId, RequestCount::getCount));
+
+        events.forEach(event -> {
+            long id = event.getId();
+            event.setConfirmedRequests(res.getOrDefault(id, 0L));
+        });
     }
 
 }

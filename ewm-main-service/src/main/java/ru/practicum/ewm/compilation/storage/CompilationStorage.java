@@ -11,7 +11,7 @@ public interface CompilationStorage extends JpaRepository<Compilation, Long> {
 
     @Query("SELECT c\n" +
             "FROM Compilation c\n" +
-            "WHERE c.pinned = ?1")
+            "WHERE c.pinned = :pinned")
     List<Compilation> findAllWithPinned(Boolean pinned, Pageable pageable);
 
     boolean existsByTitle(String title);
