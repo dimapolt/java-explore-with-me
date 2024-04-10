@@ -8,24 +8,12 @@ import ru.practicum.ewm.event.model.status.EventState;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface EventStorage extends JpaRepository<Event, Long> {
     List<Event> findAllByInitiatorId(Long id, Pageable pageable);
 
-//    @Query("SELECT e\n" +
-//            "FROM Event e\n" +
-//            "WHERE 1=1\n" +
-//            "AND (e.initiator.id IN ?1 OR ?1 IS NULL) " +
-//            "AND (e.state IN ?2 OR ?2 IS NULL) " +
-//            "AND (e.category.id IN ?3 OR ?3 IS NULL) " +
-//            "AND (e.eventDate > ?4) " +
-//            "AND (e.eventDate < ?5)")
-//    List<Event> findEventsForAdmin(List<Long> users,
-//                                   List<EventState> states,
-//                                   List<Long> categories,
-//                                   LocalDateTime rangeStart,
-//                                   LocalDateTime rangeEnd,
-//                                   Pageable pageable);
+    Optional<Event> findByCategoryId(Long catId);
 
     @Query("SELECT e\n" +
             "FROM Event e\n" +
@@ -42,14 +30,16 @@ public interface EventStorage extends JpaRepository<Event, Long> {
                                    LocalDateTime rangeEnd,
                                    Pageable pageable);
 
-    @Query("SELECT e " +
-            "FROM Event e " +
-            "WHERE ((?1 IS null) OR ((lower(e.annotation) LIKE concat('%', lower(?1), '%')) " +
-            "OR (lower(e.description) LIKE concat('%', lower(?1), '%')))) " +
-            "AND (e.category.id IN ?2 OR ?2 IS null) " +
-            "AND (e.paid = ?3 OR ?3 IS null) " +
-            "AND (e.eventDate > ?4) AND (e.eventDate < ?5) " +
-            "AND (?6 = false OR ((?6 = true AND e.participantLimit > (SELECT count(*) FROM Request AS r WHERE e.id = r.event.id))) " +
+    @Query("SELECT e\n" +
+            "FROM Event e\n" +
+            "WHERE ((?1 IS null) OR ((lower(e.annotation) LIKE concat('%', lower(?1), '%'))\n" +
+            "OR (lower(e.description) LIKE concat('%', lower(?1), '%'))))\n" +
+            "AND (e.category.id IN ?2 OR ?2 IS null)\n" +
+            "AND (e.paid = ?3 OR ?3 IS null)\n" +
+            "AND (e.eventDate > ?4) AND (e.eventDate < ?5)\n" +
+            "AND (?6 = false OR ((?6 = true AND e.participantLimit > " +
+            "(SELECT count(*)\n" +
+            "FROM Request AS r WHERE e.id = r.event.id)))\n" +
             "OR (e.participantLimit > 0 )) ")
     List<Event> findEventsForPublic(String text,
                                     List<Long> categories,

@@ -16,9 +16,11 @@ import ru.practicum.ewm.user.dto.mapper.UserMapper;
 import ru.practicum.ewm.user.model.User;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @UtilityClass
 public class EventMapper {
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static Event toEntity(NewEventDto newEventDto, Long userId) {
         Location location = LocationMapper.toEntity(newEventDto.getLocation());

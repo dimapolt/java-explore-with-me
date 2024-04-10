@@ -88,11 +88,11 @@ public class RequestServiceImpl implements RequestService {
         Request request = storage.findById(requestId).orElseThrow(
                 () -> new NoDataFoundException("Событие с id = " + requestId + " не найдено"));
 
-        if (!request.getEvent().getInitiator().getId().equals(userId)) {
-            throw new WrongDataException("Пользователь не может отклонить запрос не своего события");
+        if (!request.getRequester().getId().equals(userId)) {
+            throw new WrongDataException("Пользователь не может отклонить не свой запрос");
         }
 
-        request.setStatus(ReqStatus.REJECTED);
+        request.setStatus(ReqStatus.CANCELED);
         return toDto(request);
     }
 }

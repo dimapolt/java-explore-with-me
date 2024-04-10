@@ -9,7 +9,7 @@ import java.util.Set;
 @Data
 public class NewCompilationDto {
     private final Set<Long> events;
-    private final Boolean pinned;
+    private final Boolean pinned = false;
     @NotBlank
     @Size(min = 1, max = 50)
     private final String title;

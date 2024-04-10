@@ -32,11 +32,11 @@ public class BaseClient {
             if (parameters != null) {
                 statsServiceResponse = rest.exchange(path, method, requestEntity,
                         new ParameterizedTypeReference<List<StatDtoOut>>() {
-                }, parameters);
+                        }, parameters);
             } else {
                 statsServiceResponse = rest.exchange(path, method, requestEntity,
                         new ParameterizedTypeReference<List<StatDtoOut>>() {
-                });
+                        });
             }
         } catch (HttpStatusCodeException e) {
             throw new RuntimeException(e.getMessage());
