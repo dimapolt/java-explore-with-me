@@ -21,32 +21,36 @@ public interface EventStorage extends JpaRepository<Event, Long> {
             "AND (:users IS NULL OR e.initiator.id IN :users)\n" +
             "AND (:states IS NULL OR e.state IN :states)\n" +
             "AND (:categories IS NULL OR e.category.id IN :categories)\n" +
-            "AND (e.eventDate > :rangeStart)\n" +
-            "AND (e.eventDate < :rangeEnd)")
+            "AND (e.eventDate > :start)\n" +
+            "AND (e.eventDate < :end)")
     List<Event> findEventsForAdmin(List<Long> users,
                                    List<EventState> states,
                                    List<Long> categories,
-                                   LocalDateTime rangeStart,
-                                   LocalDateTime rangeEnd,
+                                   LocalDateTime start,
+                                   LocalDateTime end,
                                    Pageable pageable);
 
     @Query("SELECT e\n" +
             "FROM Event e\n" +
-            "WHERE ((?1 IS null) OR ((lower(e.annotation) LIKE concat('%', lower(?1), '%'))\n" +
-            "OR (lower(e.description) LIKE concat('%', lower(?1), '%'))))\n" +
-            "AND (e.category.id IN ?2 OR ?2 IS null)\n" +
-            "AND (e.paid = ?3 OR ?3 IS null)\n" +
-            "AND (e.eventDate > ?4) AND (e.eventDate < ?5)\n" +
-            "AND (?6 = false OR ((?6 = true AND e.participantLimit > " +
+            "WHERE 1=1\n" +
+            "AND e.state = 'PUBLISHED'\n" +
+            "AND (:text IS NULL OR ((LOWER(e.annotation) LIKE CONCAT('%', lower(:text), '%'))\n" +
+            "OR (LOWER(e.description) LIKE CONCAT('%', lower(:text), '%'))))\n" +
+            "AND (:categories IS NULL OR e.category.id IN :categories)\n" +
+            "AND (:paid IS NULL OR e.paid = :paid)\n" +
+            "AND (e.eventDate > :start) AND (e.eventDate < :end)\n" +
+            "AND (:available = false OR (:available = true AND (e.participantLimit > " +
             "(SELECT count(*)\n" +
-            "FROM Request AS r WHERE e.id = r.event.id)))\n" +
-            "OR (e.participantLimit > 0 )) ")
+            "FROM Request AS r\n" +
+            "WHERE e.id = r.event.id\n" +
+            "AND r.status = 'CONFIRMED')\n" +
+            "OR (e.participantLimit = 0 )))) ")
     List<Event> findEventsForPublic(String text,
                                     List<Long> categories,
                                     Boolean paid,
-                                    LocalDateTime rangeStart,
-                                    LocalDateTime rangeEnd,
-                                    boolean onlyAvailable,
+                                    LocalDateTime start,
+                                    LocalDateTime end,
+                                    boolean available,
                                     Pageable pageable);
 
 }

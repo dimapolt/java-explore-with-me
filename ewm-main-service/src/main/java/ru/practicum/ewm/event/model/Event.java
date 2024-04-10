@@ -28,7 +28,7 @@ public class Event {
     @JoinColumn(name = "category")
     private Category category;
     @Column(name = "confirmed_requests")
-    private Integer confirmedRequests;
+    private Long confirmedRequests;
     @Column(name = "created_on")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", shape = JsonFormat.Shape.STRING)
     private LocalDateTime createdOn;

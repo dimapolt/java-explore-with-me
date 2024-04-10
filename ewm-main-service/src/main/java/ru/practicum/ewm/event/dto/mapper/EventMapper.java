@@ -29,7 +29,7 @@ public class EventMapper {
         return new Event(null,
                 newEventDto.getAnnotation(),
                 new Category(newEventDto.getCategory(), null),
-                0,
+                0L,
                 LocalDateTime.now(),
                 newEventDto.getDescription(),
                 newEventDto.getEventDate(),

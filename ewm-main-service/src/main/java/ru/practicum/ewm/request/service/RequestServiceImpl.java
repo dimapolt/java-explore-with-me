@@ -48,9 +48,9 @@ public class RequestServiceImpl implements RequestService {
             throw new WrongDataException("Пользователь отправляет заявку на своё событие");
         }
 
-        int confirmedRequest = storage.getConfirmedRequests(eventId).orElse(0);
+        long confirmedRequest = storage.getConfirmedRequests(eventId).orElse(0L);
 
-        if (event.getParticipantLimit() != 0 && event.getParticipantLimit().equals(confirmedRequest)) {
+        if (event.getParticipantLimit() != 0 && event.getParticipantLimit() == confirmedRequest) {
             throw new WrongDataException("Достигнуто ограничение на число заявок у данного события");
         }
 
