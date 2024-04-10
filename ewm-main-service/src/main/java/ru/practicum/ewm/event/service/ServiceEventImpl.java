@@ -371,8 +371,8 @@ public class ServiceEventImpl implements ServiceEvent {
      * а также принадлежность событию c идентификатором @param eventId
      */
     private void checkRequests(List<Request> requests, Long eventId) {
-        Optional<Request> noValidReq = requests.stream().
-                filter(request -> !request.getStatus().equals(ReqStatus.PENDING)
+        Optional<Request> noValidReq = requests.stream()
+                        .filter(request -> !request.getStatus().equals(ReqStatus.PENDING)
                         || !request.getEvent().getId().equals(eventId))
                 .findFirst();
         if (noValidReq.isPresent()) {
