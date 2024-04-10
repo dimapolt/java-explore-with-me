@@ -33,6 +33,10 @@ public class StatServiceImpl implements StatService {
     public List<StatDtoOut> getStats(StatRequest request) {
         log.info("Вызов getStats в StatServiceImpl");
 
+        if (request.getStart() == null || request.getEnd() == null) {
+            throw new IllegalArgumentException("Необходимо указать дату начала и конца периода");
+        }
+
         if (request.getStart().isAfter(request.getEnd())) {
             throw new IllegalArgumentException("Начало периода после окончания");
         }
