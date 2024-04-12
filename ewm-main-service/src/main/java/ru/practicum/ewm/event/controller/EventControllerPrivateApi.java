@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.NewEventDto;
 import ru.practicum.ewm.event.dto.UpdateEventUserRequest;
-import ru.practicum.ewm.event.service.ServiceEvent;
+import ru.practicum.ewm.event.service.EventService;
 import ru.practicum.ewm.request.dto.EventRequestStatusUpdateRequest;
 import ru.practicum.ewm.request.dto.EventRequestStatusUpdateResult;
 import ru.practicum.ewm.request.dto.RequestDto;
@@ -26,7 +26,7 @@ import java.util.List;
 @RequestMapping(path = "/users/{userId}/events")
 @Validated
 public class EventControllerPrivateApi {
-    private final ServiceEvent service;
+    private final EventService service;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)

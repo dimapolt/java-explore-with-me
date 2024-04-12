@@ -14,7 +14,7 @@ import ru.practicum.ewm.util.requests.EwmRequestParams;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
-public interface ServiceEvent {
+public interface EventService {
 
     EventFullDto createEventPrivate(NewEventDto eventDto, Long userId);
 

@@ -25,7 +25,8 @@ public class BaseClient {
         return makeAndSendRequest(HttpMethod.POST, path, null, body);
     }
 
-    private ResponseEntity<List<StatDtoOut>> makeAndSendStat(HttpMethod method, String path, @Nullable Map<String, Object> parameters) {
+    private ResponseEntity<List<StatDtoOut>> makeAndSendStat(HttpMethod method, String path,
+                                                             @Nullable Map<String, Object> parameters) {
         HttpEntity<List<StatDtoOut>> requestEntity = new HttpEntity<>(null, getHeaders());
         ResponseEntity<List<StatDtoOut>> statsServiceResponse;
         try {
