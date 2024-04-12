@@ -6,7 +6,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
-import ru.practicum.ewm.event.service.ServiceEvent;
+import ru.practicum.ewm.event.service.EventService;
 import ru.practicum.ewm.util.requests.EventsPublicRequest;
 import ru.practicum.ewm.util.requests.EwmRequestParams;
 
@@ -22,7 +22,7 @@ import java.util.List;
 @RequestMapping(path = "/events")
 @Validated
 public class EventControllerPublicApi {
-    private final ServiceEvent service;
+    private final EventService service;
 
     @GetMapping
     public List<EventFullDto> getEventsPublic(@RequestParam(required = false) String text,

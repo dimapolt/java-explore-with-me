@@ -41,7 +41,7 @@ import static ru.practicum.ewm.event.model.status.EvenStateUser.CANCEL_REVIEW;
 
 @Service
 @RequiredArgsConstructor
-public class ServiceEventImpl implements ServiceEvent {
+public class EventServiceImpl implements EventService {
     private final EventStorage storage;
     private final EwmValidationService validation;
     private final StatClient statClient;

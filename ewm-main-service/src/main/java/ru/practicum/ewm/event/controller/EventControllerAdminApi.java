@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewm.event.dto.EventFullDto;
 import ru.practicum.ewm.event.dto.UpdateEventAdminRequest;
 import ru.practicum.ewm.event.model.status.EventState;
-import ru.practicum.ewm.event.service.ServiceEvent;
+import ru.practicum.ewm.event.service.EventService;
 import ru.practicum.ewm.util.requests.EventsAdminRequest;
 import ru.practicum.ewm.util.requests.EwmRequestParams;
 
@@ -24,7 +24,7 @@ import java.util.List;
 @RequestMapping(path = "/admin/events")
 @Validated
 public class EventControllerAdminApi {
-    private final ServiceEvent service;
+    private final EventService service;
 
     @GetMapping
     public List<EventFullDto> getEventsAdmin(@RequestParam(required = false) List<Long> users,
