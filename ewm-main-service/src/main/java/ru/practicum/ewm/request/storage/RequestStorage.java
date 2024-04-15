@@ -27,5 +27,4 @@ public interface RequestStorage extends JpaRepository<Request, Long> {
             "WHERE r.event.id IN :eventIds AND r.status = 'CONFIRMED'\n" +
             "GROUP BY r.event.id")
     List<RequestCount> getConfirmedRequests(List<Long> eventIds);
-
 }
