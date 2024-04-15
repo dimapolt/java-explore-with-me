@@ -24,11 +24,11 @@ import java.util.stream.Collectors;
 public class MainExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler
-    public ResponseEntity<ErrorDescription> catchNoDataFoundException(NoDataFoundException exception) {
-        log.warn(exception.getMessage());
+    public ResponseEntity<ErrorDescription> catchNoDataFoundException(NoDataFoundException e) {
+        log.warn(e.getMessage());
         ErrorDescription description = new ErrorDescription(HttpStatus.NOT_FOUND,
                 "The required object was not found.",
-                exception.getMessage(),
+                e.getMessage(),
                 LocalDateTime.now());
 
         return new ResponseEntity<>(description, HttpStatus.NOT_FOUND);
@@ -36,17 +36,17 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     @NonNull
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException e,
                                                                   @NonNull HttpHeaders headers,
                                                                   @NonNull HttpStatus status,
                                                                   @NonNull WebRequest request) {
         List<ErrorDescription> response = new ArrayList<>();
 
-        ex.getBindingResult()
+        e.getBindingResult()
                 .getAllErrors()
                 .forEach((error) -> response.add(
                         new ErrorDescription(HttpStatus.BAD_REQUEST,
-                                "",
+                                error.getClass().getSimpleName(),
                                 error.getDefaultMessage(),
                                 LocalDateTime.now()))
                 );
@@ -61,46 +61,55 @@ public class MainExceptionHandler extends ResponseEntityExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ResponseEntity<Object> onConstraintValidationException(
             ConstraintViolationException e) {
+        log.warn(e.getMessage());
         List<ErrorDescription> response = e.getConstraintViolations().stream()
-                .map(er -> new ErrorDescription(HttpStatus.BAD_REQUEST, "", er.getMessage(), LocalDateTime.now()))
+                .map(error -> new ErrorDescription(HttpStatus.BAD_REQUEST,
+                        e.getClass().getSimpleName(),
+                        error.getMessage(),
+                        LocalDateTime.now()))
                 .collect(Collectors.toList());
 
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorDescription> catchAlreadyExistException(AlreadyExistException exception) {
-        log.warn(exception.getMessage());
-        ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT, "",
-                exception.getMessage(), LocalDateTime.now());
+    public ResponseEntity<ErrorDescription> catchAlreadyExistException(AlreadyExistException e) {
+        log.warn(e.getMessage());
+        ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT,
+                e.getClass().getSimpleName(),
+                e.getMessage(),
+                LocalDateTime.now());
         return new ResponseEntity<>(description, description.getStatus());
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorDescription> catchWrongDataException(WrongDataException exception) {
-        log.warn(exception.getMessage());
-        ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT, "",
-                exception.getMessage(), LocalDateTime.now());
+    public ResponseEntity<ErrorDescription> catchWrongDataException(WrongDataException e) {
+        log.warn(e.getMessage());
+        ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT,
+                e.getClass().getSimpleName(),
+                e.getMessage(),
+                LocalDateTime.now());
         return new ResponseEntity<>(description, description.getStatus());
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorDescription> catchIllegalArgumentException(IllegalArgumentException exception) {
-        log.warn(exception.getMessage());
-        ErrorDescription error = new ErrorDescription(HttpStatus.BAD_REQUEST, "",
-                exception.getMessage(),
+    public ResponseEntity<ErrorDescription> catchIllegalArgumentException(IllegalArgumentException e) {
+        log.warn(e.getMessage());
+        ErrorDescription error = new ErrorDescription(HttpStatus.BAD_REQUEST,
+                e.getClass().getSimpleName(),
+                e.getMessage(),
                 LocalDateTime.now());
         return new ResponseEntity<>(error, error.getStatus());
     }
 
     @ExceptionHandler
-    public ResponseEntity<ErrorDescription> catchSQLException(SQLException exception) {
+    public ResponseEntity<ErrorDescription> catchSQLException(SQLException e) {
+        log.warn(e.getMessage());
         ErrorDescription description = new ErrorDescription(HttpStatus.CONFLICT,
-                "",
-                exception.getMessage(),
+                e.getClass().getSimpleName(),
+                e.getMessage(),
                 LocalDateTime.now());
 
-        log.warn("Ошибка, от БД");
         return new ResponseEntity<>(description, description.getStatus());
     }
 }

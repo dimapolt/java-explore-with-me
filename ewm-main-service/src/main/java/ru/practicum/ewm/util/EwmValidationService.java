@@ -12,6 +12,7 @@ import ru.practicum.ewm.event.storage.EventStorage;
 import ru.practicum.ewm.event.storage.LocationStorage;
 import ru.practicum.ewm.exception.NoDataFoundException;
 import ru.practicum.ewm.exception.WrongDataException;
+import ru.practicum.ewm.request.storage.RequestStorage;
 import ru.practicum.ewm.user.model.User;
 import ru.practicum.ewm.user.storage.UserStorage;
 
@@ -31,6 +32,7 @@ public class EwmValidationService {
     private final CategoryStorage categoryStorage;
     private final LocationStorage locationStorage;
     private final EventStorage eventStorage;
+    private final RequestStorage requestStorage;
 
     public void formEvent(Event event) {
         Long userId = event.getInitiator().getId();
@@ -91,5 +93,11 @@ public class EwmValidationService {
         if (start.isAfter(end)) {
             throw new IllegalArgumentException("Начало периода после окончания");
         }
+    }
+
+    public void checkRequest(Long requesterId, Long eventId) {
+        requestStorage.findByRequesterIdAndEventId(requesterId, eventId).orElseThrow(
+                () -> new WrongDataException("Пользователь с id = " + requesterId +
+                                                           " не принимал участие в событии с id = " + eventId));
     }
 }
