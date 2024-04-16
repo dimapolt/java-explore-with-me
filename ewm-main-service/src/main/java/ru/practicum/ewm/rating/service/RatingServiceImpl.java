@@ -26,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -50,10 +51,14 @@ public class RatingServiceImpl implements RatingService {
         }
         // Проверка, что пользователь делал запрос, и следовательно участвовал в событии
         validation.checkRequest(userId, eventId);
-        storage.findByRaterIdAndEventId(userId, eventId).orElseThrow(
-                () -> new WrongDataException("Оценка от пользователя с id = " + userId +
-                        " событию с id = " + eventId +
-                        " уже поставлена"));
+        Optional<Rating> ratingO = storage.findByRaterIdAndEventId(userId, eventId);
+
+        if (ratingO.isPresent()) {
+            throw new WrongDataException("Оценка от пользователя с id = " + userId +
+                    " событию с id = " + eventId +
+                    " уже поставлена");
+        }
+
 
         Rating rating = new Rating(null, event, event.getInitiator(), rater, mark);
         return storage.save(rating);
